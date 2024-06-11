@@ -6,10 +6,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm
+from .forms import *
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import Hotel, Room, Booking
+from .models import *
 from .serializers import HotelSerializer, RoomSerializer, BookingSerializer
 
 
@@ -76,3 +76,21 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
+
+@login_required
+def user_details(request):
+    reservations = Reservation.objects.filter(user=request.user)
+    return render(request, 'user_details.html', {'reservations': reservations})
+
+@login_required
+def book_room(request):
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            reservation = form.save(commit=False)
+            reservation.user = request.user
+            reservation.save()
+            return redirect('user_details')
+    else:
+        form = BookingForm()
+    return render(request, 'book_room.html', {'form': form})

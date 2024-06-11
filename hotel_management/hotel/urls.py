@@ -2,7 +2,6 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HotelViewSet, RoomViewSet, BookingViewSet
 from .views import *
 
 router = DefaultRouter()
@@ -16,4 +15,6 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('signup/', signup_view, name='signup'),
     path('logout/', logout_view, name='logout'),
+    path('user/', user_details, name='user_details'),
+    path('book/', book_room, name='book_room'),
 ]

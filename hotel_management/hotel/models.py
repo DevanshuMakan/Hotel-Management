@@ -14,14 +14,25 @@ class Hotel(models.Model):
     def __str__(self):
         return self.name
 
+
+
 class Room(models.Model):
-    hotel = models.ForeignKey(Hotel, related_name='rooms', on_delete=models.CASCADE)
-    room_number = models.CharField(max_length=10)
+    room_number = models.CharField(max_length=5)
     room_type = models.CharField(max_length=50)
-    price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=6, decimal_places=2,null=True)
+    availability = models.BooleanField(default=True)
 
     def __str__(self):
-        return f'{self.room_number} - {self.room_type}'
+        return f'Room {self.room_number} - {self.room_type}'
+
+class Reservation(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    check_in = models.DateTimeField()
+    check_out = models.DateTimeField()
+
+    def __str__(self):
+        return f'Reservation by {self.user.username} for {self.room.room_number}'
 
 class Booking(models.Model):
     user = models.ForeignKey(User, related_name='bookings', on_delete=models.CASCADE)
