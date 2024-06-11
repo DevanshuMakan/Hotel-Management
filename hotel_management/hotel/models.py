@@ -19,7 +19,7 @@ class Hotel(models.Model):
 class Room(models.Model):
     room_number = models.CharField(max_length=5)
     room_type = models.CharField(max_length=50)
-    price = models.DecimalField(max_digits=6, decimal_places=2,null=True)
+    price = models.DecimalField(max_digits=6, decimal_places=2, null=True)
     availability = models.BooleanField(default=True)
 
     def __str__(self):
