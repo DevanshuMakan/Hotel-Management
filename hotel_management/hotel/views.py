@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
 
@@ -82,15 +82,37 @@ def user_details(request):
     reservations = Reservation.objects.filter(user=request.user)
     return render(request, 'user_details.html', {'reservations': reservations})
 
-@login_required
+
 def book_room(request):
     if request.method == 'POST':
-        form = BookingForm(request.POST)
+        form = ReservationForm(request.POST)
         if form.is_valid():
+            room = form.cleaned_data['room']
+            check_in = form.cleaned_data['check_in']
+            check_out = form.cleaned_data['check_out']
+
+            # Check if the room is available
+            overlapping_reservations = Reservation.objects.filter(
+                room=room,
+                check_in__lt=check_out,
+                check_out__gt=check_in
+            )
+            if overlapping_reservations.exists():
+                error_message = 'This room is already booked for the selected dates.'
+                return render(request, 'book_room.html', {'form': form, 'error_message': error_message})
+
             reservation = form.save(commit=False)
             reservation.user = request.user
             reservation.save()
             return redirect('user_details')
     else:
-        form = BookingForm()
+        form = ReservationForm()
     return render(request, 'book_room.html', {'form': form})
+
+@login_required
+def cancel_reservation(request, reservation_id):
+    reservation = get_object_or_404(Reservation, id=reservation_id, user=request.user)
+    if request.method == 'POST':
+        reservation.delete()
+        return redirect('user_details')
+    return render(request, 'cancel_reservation.html', {'reservation': reservation})

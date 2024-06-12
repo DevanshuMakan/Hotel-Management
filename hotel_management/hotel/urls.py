@@ -17,4 +17,6 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('user/', user_details, name='user_details'),
     path('book/', book_room, name='book_room'),
+    path('cancel/<int:reservation_id>/', cancel_reservation, name='cancel_reservation'),
+
 ]

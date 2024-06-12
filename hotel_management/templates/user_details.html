@@ -1,3 +1,5 @@
+<!-- hotel/templates/user_details.html -->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,22 +12,28 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Room</th>
-                    <th>Check-in</th>
-                    <th>Check-out</th>
+                    <th>Room Number</th>
+                    <th>Room Type</th>
+                    <th>Check-in Date</th>
+                    <th>Check-out Date</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for reservation in reservations %}
                 <tr>
                     <td>{{ reservation.room.room_number }}</td>
+                    <td>{{ reservation.room.room_type }}</td>
                     <td>{{ reservation.check_in }}</td>
                     <td>{{ reservation.check_out }}</td>
+                    <td>
+                        <a href="{% url 'cancel_reservation' reservation.id %}" class="btn btn-danger">Cancel</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <a href="{% url 'book_room' %}" class="btn btn-primary">Book a Room</a>
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

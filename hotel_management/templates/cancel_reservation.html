@@ -1,23 +1,17 @@
-<!-- hotel/templates/book_room.html -->
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Book Room</title>
+    <title>Cancel Reservation</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h2 class="mt-5">Book a Room</h2>
-        {% if error_message %}
-        <div class="alert alert-danger" role="alert">
-            {{ error_message }}
-        </div>
-        {% endif %}
+        <h2 class="mt-5">Cancel Reservation</h2>
+        <p>Are you sure you want to cancel your reservation for Room {{ reservation.room.room_number }}?</p>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Book Room</button>
+            <button type="submit" class="btn btn-danger">Cancel Reservation</button>
+            <a href="{% url 'user_details' %}" class="btn btn-secondary">Back</a>
         </form>
     </div>
 
