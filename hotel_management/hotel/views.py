@@ -17,18 +17,24 @@ class HotelViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
 
+
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
+
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
 
+
 def home(request):
     return render(request, 'index.html')
+
+
 def home(request):
     return render(request, 'index.html')
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -44,6 +50,7 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
+
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -58,24 +65,30 @@ def signup_view(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
+
 @login_required
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+
 class HotelViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
     serializer_class = HotelSerializer
     permission_classes = [IsAuthenticated]
+
 
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     permission_classes = [IsAuthenticated]
 
+
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     permission_classes = [IsAuthenticated]
+
 
 @login_required
 def user_details(request):
@@ -108,6 +121,7 @@ def book_room(request):
     else:
         form = ReservationForm()
     return render(request, 'book_room.html', {'form': form})
+
 
 @login_required
 def cancel_reservation(request, reservation_id):
