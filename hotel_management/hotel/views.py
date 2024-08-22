@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
 
 # Create your views here.
@@ -11,6 +12,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import HotelSerializer, RoomSerializer, BookingSerializer
+from .services import *
 
 
 class HotelViewSet(viewsets.ModelViewSet):
@@ -27,13 +29,19 @@ class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
 
-
 def home(request):
-    return render(request, 'index.html')
+    return render(request, 'home.html')
 
+def user_account(request):
+    bookings = Booking.objects.filter(user=request.user)
+    return render(request, 'user_account.html', {'bookings': bookings})
 
-def home(request):
-    return render(request, 'index.html')
+@login_required
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    booking.delete()
+    return redirect('user_account')
+
 
 
 def login_view(request):
@@ -96,31 +104,30 @@ def user_details(request):
     return render(request, 'user_details.html', {'reservations': reservations})
 
 
+
 def book_room(request):
     if request.method == 'POST':
-        form = ReservationForm(request.POST)
-        if form.is_valid():
-            room = form.cleaned_data['room']
-            check_in = form.cleaned_data['check_in']
-            check_out = form.cleaned_data['check_out']
+        checkin_date = request.POST.get('checkin_date')
+        checkout_date = request.POST.get('checkout_date')
+        room_type = request.POST.get('room_type')
+        guests = request.POST.get('guests')
+        special_requests = request.POST.get('special_requests')
 
-            # Check if the room is available
-            overlapping_reservations = Reservation.objects.filter(
-                room=room,
-                check_in__lt=check_out,
-                check_out__gt=check_in
-            )
-            if overlapping_reservations.exists():
-                error_message = 'This room is already booked for the selected dates.'
-                return render(request, 'book_room.html', {'form': form, 'error_message': error_message})
+        # Create a new booking instance and save it
+        booking = Booking(
+            user=request.user,
+            checkin_date=checkin_date,
+            checkout_date=checkout_date,
+            room_type=room_type,
+            guests=guests,
+            special_requests=special_requests
+        )
+        booking.save()
 
-            reservation = form.save(commit=False)
-            reservation.user = request.user
-            reservation.save()
-            return redirect('user_details')
-    else:
-        form = ReservationForm()
-    return render(request, 'book_room.html', {'form': form})
+        messages.success(request, 'Your room has been booked successfully!')
+        return redirect('user_account')  # Redirect to the user account page where bookings are displayed
+
+    return render(request, 'book_room.html')
 
 
 @login_required
@@ -130,3 +137,15 @@ def cancel_reservation(request, reservation_id):
         reservation.delete()
         return redirect('user_details')
     return render(request, 'cancel_reservation.html', {'reservation': reservation})
+
+def room_availability(request):
+    if request.method == 'POST':
+        checkin_date = request.POST.get('checkin_date')
+        checkout_date = request.POST.get('checkout_date')
+        location = request.POST.get('location')
+
+        availability = get_room_availability(checkin_date, checkout_date, location)
+
+        return render(request, 'hotel/room_availability.html', {'availability': availability})
+
+    return render(request, 'hotel/room_availability.html')

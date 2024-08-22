@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Account</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .account-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .booking-card {
+            margin-bottom: 20px;
+        }
+        .no-bookings {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .home-button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Home Button -->
+        <div class="home-button">
+            <a href="{% url 'home' %}" class="btn btn-primary">Home</a>
+        </div>
+
+        <div class="account-header">
+            <h1>Welcome, {{ request.user.username }}</h1>
+            <p>Your Account Dashboard</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Your Bookings</h2>
+                {% if bookings %}
+                    <div class="row">
+                        {% for booking in bookings %}
+                            <div class="col-md-4">
+                                <div class="card booking-card">
+                                    <div class="card-header">
+                                        Room: {{ booking.room_type|title }}
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Check-in Date:</strong> {{ booking.checkin_date }}</p>
+                                        <p><strong>Check-out Date:</strong> {{ booking.checkout_date }}</p>
+                                        <p><strong>Guests:</strong> {{ booking.guests }}</p>
+                                        {% if booking.special_requests %}
+                                            <p><strong>Special Requests:</strong> {{ booking.special_requests }}</p>
+                                        {% endif %}
+                                        <form method="POST" action="{% url 'cancel_booking' booking.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger btn-sm mt-3">Cancel Reservation</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="no-bookings">You have no bookings.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

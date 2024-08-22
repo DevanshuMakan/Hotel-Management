@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Availability</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Check Room Availability</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="checkin_date">Check-in Date:</label>
+                <input type="date" class="form-control" id="checkin_date" name="checkin_date" required>
+            </div>
+            <div class="form-group">
+                <label for="checkout_date">Check-out Date:</label>
+                <input type="date" class="form-control" id="checkout_date" name="checkout_date" required>
+            </div>
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" class="form-control" id="location" name="location" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Check Availability</button>
+        </form>
+
+        {% if availability %}
+            <div class="mt-4">
+                <h3>Available Rooms:</h3>
+                {% if availability.error %}
+                    <p class="text-danger">{{ availability.error }}</p>
+                {% else %}
+                    <ul class="list-group">
+                        {% for room in availability.rooms %}
+                            <li class="list-group-item">
+                                <strong>{{ room.name }}</strong> - {{ room.price }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -5,6 +5,9 @@ from django.db import models
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from openid.message import NULL_NAMESPACE
+
 
 class Hotel(models.Model):
     name = models.CharField(max_length=100)
@@ -34,11 +37,21 @@ class Reservation(models.Model):
     def __str__(self):
         return f'Reservation by {self.user.username} for {self.room.room_number}'
 
+
 class Booking(models.Model):
-    user = models.ForeignKey(User, related_name='bookings', on_delete=models.CASCADE)
-    room = models.ForeignKey(Room, related_name='bookings', on_delete=models.CASCADE)
-    check_in = models.DateField()
-    check_out = models.DateField()
+    ROOM_CHOICES = (
+        ('single', 'Single Room'),
+        ('double', 'Double Room'),
+        ('suite', 'Suite'),
+    )
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    checkin_date = models.DateField()
+    checkout_date = models.DateField()
+    room_type = models.CharField(max_length=10, choices=ROOM_CHOICES, default='single')  # Provide a default value
+    guests = models.IntegerField(null=True)
+    special_requests = models.TextField(blank=True, null=True)
+    booking_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.user.username} booking for room {self.room.room_number}'
+        return f"{self.user.username} - {self.room_type} - {self.checkin_date} to {self.checkout_date}"
